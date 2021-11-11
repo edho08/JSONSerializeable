@@ -64,8 +64,8 @@ export abstract class BaseJSONSerializable implements JSONSerializeAble{
 		//JContainers
 		JDB()?.solveStrSetter(path, JSON.stringify(data), true);
 	}
-	public static deserialize(path:string, type?:Function){
-		TypeManager.deserialize(path, type);
+	public static deserialize(path:string, type?:Function):any{
+		return TypeManager.deserialize(path, type);
 	}
 }
 
@@ -90,19 +90,19 @@ export class TypeManager {
 	public static get instance():TypeManager{
 		return TypeManager._instance || (TypeManager._instance = new TypeManager());
 	}
-	public static deserialize(path:string, type?:Function):JSONSerializeAble{
+	public static deserialize(path:string, type?:Function):any{
 		//God! Help us. Save the king!
 		let data:string = JDB()?.solveStr(path, "{}");
 		let protoObj:JSONAllData = JSON.parse(data);
 		let Cls:Function | undefined = undefined;
 		let obj:any = null;
 		
-		//if user suplied type
+		//if user supplied type
 		if(type)
 			Cls = type;
 		//else use type that are registered
 		else
-			Cls:Function | undefined = TypeManager.instance.Types.get(protoObj.class);
+			Cls = TypeManager.instance.Types.get(protoObj.class);
 		
 		//You forgot to add your type to TypeManager and not providing with type. Fallback!
 		if(!Cls)
@@ -115,7 +115,7 @@ export class TypeManager {
 			//The very definition of Evil. (and you think Harkon is bad)
 			Object.keys(protoObj).forEach((key:string)=>{(obj as JSONAllData)[key]=protoObj[key]});
 			//Let user repair object
-			(obj as any).onObjectDeserialization(protoObj);
+			(obj as JSONSerializeAble).onObjectDeserialization(protoObj);
 		}
 		//Finally, to die in peace. Requescat in Pace
 		return obj;
