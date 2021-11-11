@@ -1,5 +1,3 @@
 #LIB
 dist
-node_modules
-tsc/config.js
 tsconfig-default.json
