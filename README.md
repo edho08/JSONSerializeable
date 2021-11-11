@@ -14,7 +14,7 @@ This tutorial is written in Skyrim Platform plugin-example
    };
    ```
 
-3. Run `npm run dev`. If everything is ok, the message `Found 0 errors, installing plugin-example.js` will appear.
+3. Run `npm run dev`. If everything is ok, the message `Found 0 errors` will appear.
 4. Log in to Steam and start the game with `skse64_loader.exe`.
 
 # Requirement
