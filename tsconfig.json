@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strict": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "module": "System",
+    "target": "ES5",
+    "outFile": "./dist/JSONSerializeable.js",
+    "rootDir": "",
+    "lib": [
+      "ES2015"
+    ],
+    "paths": {
+      "chai": [
+        "./node_modules/@types/chai"
+      ]
+    },
+    "baseUrl": "D:\\Game\\The Elder Scrolls - Skyrim - Special Edition\\Data\\Platform\\Modules"
+  },
+  "include": [
+    "./*.ts"
+  ]
+}
