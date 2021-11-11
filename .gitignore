@@ -106,3 +106,6 @@ release/auto-unequip-ammo.js
 *.zip
 Platform/Plugins/auto-unequip-ammo.js
 
+#node-modules
+node_modules/**
+node_modules
