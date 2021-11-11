@@ -4,7 +4,7 @@ export let JDB = ()=>(sp as any).JDB
 
 /*
 * @interface JsonSerializeAbleData 	: This javascript artifact can hold anything you want.
-* @Member   onObjectSerialization 	: Call this before serializing Object on base class
+* @Member	onObjectSerialization 	: Call this before serializing Object on base class
 * @Member	onObjectDeserialization : Call this after deserializing Object on base class
 * @Member	serialize				: Serialize object to JSON
 * @Member	deserialize				: Deserialize object from JSON
@@ -16,7 +16,7 @@ export interface JSONAllData{
 /*
 * @interface JSONSerializeAble 		: Implement to save to JSON for custom way to serialize Object.
 * @Member	path 					: Path to save on JContainer. Should be unique per object instance
-* @Member   onObjectSerialization 	: Call this before serializing Object on base class
+* @Member	onObjectSerialization 	: Call this before serializing Object on base class
 * @Member	onObjectDeserialization : Call this after deserializing Object on base class
 * @Member	serialize				: Serialize object to JSON
 * @Member	deserialize				: Deserialize object from JSON
@@ -71,12 +71,11 @@ export abstract class BaseJSONSerializable implements JSONSerializeAble{
 
 
 /*
- @class TypeManager 	: On first load be sure to add Script Type to this so it can be deserialized.
-						  Unless i figured how to get Class from somewhere, this is all we got.
+ @class TypeManager 	: On first load be sure to add Script Type to this so it can be deserialized. Unless i figured how to get Class from somewhere, this is all we got.
  @Member _instance		: Singleton instance.
  @Member Types 			: Type known.
  @Func addType 			: add Script Type
-	@param addType 		: Script Type
+ @param addType 		: Script Type
  @Getter instance		: singleton		
 */
 export class TypeManager {
