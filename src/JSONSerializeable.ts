@@ -38,7 +38,7 @@ export interface JSONSerializeAble{
 }
 
 /*
-* @interface BaseJSONSerializeAble 		: Implement to save to JSON.
+* @class BaseJSONSerializeAble 		: Implement to save to JSON.
 * @Member	onObjectSerialization 	: Call this before serializing Object on base class
 * @Member	onObjectDeserialization : Call this after deserializing Object on base class
 * @Member	serialize				: Serialize object to JSON
