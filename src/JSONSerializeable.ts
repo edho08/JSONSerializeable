@@ -34,7 +34,21 @@ export interface JSONSerializeAble{
 	/*
 	*	Call this to serialize object
 	*/
-	serializeObject(path:string):void;
+	serialize(path:string):void;
+	/*
+	*	This will be called after am object property is deserialized
+	*/
+	onMemberDeserialized(prop:string, value:any):void;
+	/*
+	*	This will be called on serialization
+	*/
+	onMemberSerialized(prop:string, data:JSONAllData):void;
+	/*
+	*
+	*/
+	onMemberSerializedReplace(prop:string, value:any):any;
+	onMemberDeserialzedRevive(prop:string, value:any):any;
+	
 }
 
 /*
@@ -53,18 +67,26 @@ export abstract class BaseJSONSerializable implements JSONSerializeAble{
 	public onObjectDeserialization(protoObj:any):any{
 		
 	}
-	public serializeObject(path:string):void{
-		//Mask as JSON data holder
-		let data:JSONAllData = (this as any);
-		//Evil! get class name
-		data.class = this.constructor.name;
-		//Let user add more data to store
-		this.onObjectSerialization(data);
-		//JContainers
-		JDB()?.solveStrSetter(path, JSON.stringify(data), true);
+	public serialize(path:string):void{
+		TypeManager.serialize(path, this);
 	}
-	public static deserialize(path:string, type?:Function):any{
+	public static deserialize(path:string, type?:typeof BaseJSONSerializable):any{
 		return TypeManager.deserialize(path, type);
+	}
+	
+	public onMemberDeserialized(prop:string, value:any):void{
+		
+	} 
+	
+	public onMemberSerialized(prop:string, data:JSONAllData):void{
+		
+	}
+	
+	public onMemberSerializedReplace(prop:string, value:any):any{
+		return value;
+	}
+	public onMemberDeserialzedRevive(prop:string, value:any):any{
+		return value;
 	}
 }
 
@@ -79,21 +101,28 @@ export abstract class BaseJSONSerializable implements JSONSerializeAble{
 */
 export class TypeManager {
 	private static _instance:TypeManager = new TypeManager;
-	public Types:Map<string,Function> = new Map;
+	public Types:Map<string, typeof BaseJSONSerializable> = new Map;
 	
-	public addType(type:Function){
+	public addType(type:typeof BaseJSONSerializable){
 		this.Types.set(type.name, type);
+	}
+	
+	public getType(name:string):typeof BaseJSONSerializable|undefined{
+		return this.Types.get(name);
 	}
 	
 	public static get instance():TypeManager{
 		return TypeManager._instance || (TypeManager._instance = new TypeManager());
 	}
-	public static deserialize(path:string, type?:Function):any{
+	
+	public static deserialize(path:string, type?:typeof BaseJSONSerializable):any{
 		//God! Help us. Save the king!
 		let data:string = JDB()?.solveStr(path, "{}");
 		let protoObj:JSONAllData = JSON.parse(data);
-		let Cls:Function | undefined = undefined;
+		let Cls:typeof BaseJSONSerializable | undefined = undefined;
 		let obj:any = null;
+		
+		//sp.writeLogs('JSONSerializeAble', data)
 		
 		//if user supplied type
 		if(type)
@@ -108,15 +137,47 @@ export class TypeManager {
 		
 		//JS shenanigan
 		if(Cls && protoObj){ 
-			//Call constructor with parameter of all data we had.
-			obj = new (Function.prototype.bind.apply(Cls, protoObj as any));
+			//Call constructor with parameter of all data we had (EVIL).
+      //@ts-ignore
+			obj = new Cls();
+      
 			//The very definition of Evil. (and you think Harkon is bad)
-			Object.keys(protoObj).forEach((key:string)=>{(obj as JSONAllData)[key]=protoObj[key]});
-			//Let user repair object
-			(obj as JSONSerializeAble).onObjectDeserialization(protoObj);
+			Object.keys(protoObj).forEach((key:string)=>{
+				if(key == '') return;
+				
+				(obj as JSONAllData)[key]=protoObj[key];
+				//Let repair object
+				(obj as BaseJSONSerializable).onMemberDeserialized(key, protoObj[key]);
+			});
+			
+			//Repair using JSON own reviver
+			JSON.parse(data, obj.onMemberDeserialzedRevive);
+			
+			//Last call repair object
+			(obj as JSONSerializeAble).onObjectDeserialization(obj as JSONAllData);
 		}
-		//Finally, to die in peace. Requescat in Pace
+		//Finally, to die in peace. Requescat in Pace!
 		return obj;
+	}
+	
+	public static serialize<T extends BaseJSONSerializable>(path:string, obj:T):void{
+		//Mask as JSON data holder
+		let data:JSONAllData = JSON.parse(JSON.stringify(obj, obj.onMemberSerializedReplace));
+		
+    //get class name (Evil possibly?)
+		data.class = obj.constructor.name;
+    
+		//Iterate on member
+		Object.keys(obj).forEach((key:string)=>{
+			if(key == '') return;
+			obj.onMemberSerialized(key, data);
+		});
+    
+		//Let user add more data to store
+		obj.onObjectSerialization(data);
+		
+		//JContainers
+		JDB()?.solveStrSetter(path, JSON.stringify(data), true);
 	}
 }
 
